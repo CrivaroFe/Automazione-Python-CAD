@@ -1,0 +1,41 @@
+from ezdxf import new
+from ezdxf.math import Vec2
+import os
+
+doc = new(dxfversion='R2010')
+msp = doc.modelspace()
+doc.layers.new(name='Contorno', dxfattribs={'color': 7})
+doc.layers.new(name='Furos', dxfattribs={'color': 1})
+doc.layers.new(name='Cotas', dxfattribs={'color': 2})
+doc.layers.new(name='Dobras', dxfattribs={'color': 3})
+doc.layers.new(name='Texto', dxfattribs={'color': 5})
+
+chapa = [(0, 0), (400, 0), (400, 300), (0, 300), (0, 0)]
+msp.add_lwpolyline(chapa, dxfattribs={'layer': 'Contorno'})
+
+furos_pos = [Vec2(50, 50), Vec2(350, 50), Vec2(50, 250), Vec2(350, 250)]
+for pos in furos_pos:
+    msp.add_circle(center=pos, radius=5, dxfattribs={'layer': 'Furos'})
+
+x_start, y_start = 150, 140
+rasgo = [(x_start, y_start), (x_start+100, y_start), (x_start+100, y_start+20),
+         (x_start, y_start+20), (x_start, y_start)]
+msp.add_lwpolyline(rasgo, dxfattribs={'layer': 'Furos'})
+
+msp.add_line((30, 0), (30, 300), dxfattribs={'layer': 'Dobras'})
+msp.add_text("Piegare a 90°", dxfattribs={'height': 5, 'layer': 'Dobras', 'insert': (5, 305)})
+
+msp.add_text("METAL BASE", dxfattribs={'height': 15, 'layer': 'Texto', 'insert': (150, 310)})
+
+msp.add_text("Data di fabbricazione: 16/04/2025", dxfattribs={'height': 5, 'layer': 'Texto', 'insert': (150, 280)})
+
+msp.add_text("400 mm", dxfattribs={'height': 5, 'layer': 'Cotas', 'insert': (150, -10)})
+msp.add_text("300 mm", dxfattribs={'height': 5, 'layer': 'Cotas', 'insert': (-20, 150), 'rotation': 90})
+msp.add_text("10 mm", dxfattribs={'height': 5, 'layer': 'Cotas', 'insert': (50, 60)})
+msp.add_text("10 mm", dxfattribs={'height': 5, 'layer': 'Cotas', 'insert': (350, 60)})
+msp.add_text("10 mm", dxfattribs={'height': 5, 'layer': 'Cotas', 'insert': (50, 240)})
+msp.add_text("10 mm", dxfattribs={'height': 5, 'layer': 'Cotas', 'insert': (350, 240)})
+
+nome_arquivo = "METAL BASE TEST.dxf"
+doc.saveas(nome_arquivo)
+print(f"File saved: {os.path.abspath(nome_arquivo)}")
